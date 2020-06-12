@@ -47,7 +47,7 @@ Output file will contain the following fields in the CSV rows.
 - Attack (The name of any known attacks associated with this domain)
 - Threat Type (The type of the known attack, such as botnet or APT)
 
-More information on specific field description can be found [here](https://docs.umbrella.com/investigate-api/docs/security-information-for-a-domain-1):
+More information on specific field description can be found [here](https://docs.umbrella.com/investigate-api/docs/security-information-for-a-domain-1).
 
 ## single_domain_classification.py
 
