@@ -63,9 +63,9 @@ try:
     		try:
     			# If there are more samples, we want to get more details. We already walked first 100 by this point
     			if (samples_request_json['moreDataAvailable'] == True):
-    				offsets = [200,300,400,500]
+    				offsets = [100,200,300,400,500]
     				for x in offsets:
-    					URL_API='https://investigate.api.umbrella.com/samples/{}?limit={}&sortby=score'.format(domain,x)
+    					URL_API='https://investigate.api.umbrella.com/samples/{}?limit=500&offset={}&sortby=score'.format(domain,x)
 				    	samples_request_iter = session.get(URL_API, verify=False)
 				    	checkAPITimeout(samples_request_iter.headers,samples_request_iter)
 				    	time.sleep(1)
