@@ -50,57 +50,43 @@ print("{},{},{},{},{},{},{},{},{},{}".format("Date","Domain/IP","SHA256","MD5","
 try:
     fp = open(domain_list,'r')
     for single_domain in fp.readlines():
-    	domain=single_domain.strip()
-    	URL_API='https://investigate.api.umbrella.com/samples/{}?limit=500&sortby=score'.format(domain)
-    	samples_request = session.get(URL_API, verify=False)
-    	checkAPITimeout(samples_request.headers,samples_request)
-    	samples_request_json = samples_request.json()
-    	time.sleep(1)
+        domain=single_domain.strip()
+        URL_API='https://investigate.api.umbrella.com/samples/{}?limit=500&sortby=score'.format(domain)
+        samples_request = session.get(URL_API, verify=False)
+        checkAPITimeout(samples_request.headers,samples_request)
+        samples_request_json = samples_request.json()
+        time.sleep(1)
+        for event in samples_request_json['samples']:
+            print("{},{},{},{},{},{},{},{},{},{}".format(datetime.datetime.utcnow().isoformat(),str(domain).replace(".","[.]"),event['sha256'],event['md5'],event['sha1'],event['threatScore'],convertTime(event['firstSeen']),convertTime(event['lastSeen']),str(event['magicType']).replace(",","|"),event['size']))
 
-    	if 'error' in samples_request_json:
-    		print("{},{},{},{},{},{},{},{},{},{}".format(datetime.datetime.utcnow().isoformat(),str(domain).replace(".","[.]"),"No Data","No Data","No Data","No Data","No Data","No Data","No Data","No Data"))
-    	else:
-    		try:
-    			# If there are more samples, we want to get more details. We already walked first 100 by this point
-    			if (samples_request_json['moreDataAvailable'] == True):
-    				offsets = [100,200,300,400,500]
-    				for x in offsets:
-    					URL_API='https://investigate.api.umbrella.com/samples/{}?limit=500&offset={}&sortby=score'.format(domain,x)
-				    	samples_request_iter = session.get(URL_API, verify=False)
-				    	checkAPITimeout(samples_request_iter.headers,samples_request_iter)
-				    	time.sleep(1)
-				    	samples_request_json_iter = samples_request_iter.json()
-				    	if (samples_request_json_iter['moreDataAvailable'] == True):
-					    	for event in samples_request_json_iter['samples']:
-				    			print("{},{},{},{},{},{},{},{},{},{}".format(
-									datetime.datetime.utcnow().isoformat(),
-									str(domain).replace(".","[.]"),
-									event['sha256'],
-									event['md5'],
-									event['sha1'],
-									event['threatScore'],
-									convertTime(event['firstSeen']),
-									convertTime(event['lastSeen']),
-									str(event['magicType']).replace(",","|"),
-									event['size']))
-				    	else:
-				    		break
-    		except KeyError:
-    			pass
-    		
-    		for event in samples_request_json['samples']:
-    			print("{},{},{},{},{},{},{},{},{},{}".format(
-					datetime.datetime.utcnow().isoformat(),
-					str(domain).replace(".","[.]"),
-					event['sha256'],
-					event['md5'],
-					event['sha1'],
-					event['threatScore'],
-					convertTime(event['firstSeen']),
-					convertTime(event['lastSeen']),
-					str(event['magicType']).replace(",","|"),
-					event['size']))
+        if 'error' in samples_request_json:
+            print("{},{},{},{},{},{},{},{},{},{}".format(datetime.datetime.utcnow().isoformat(),str(domain).replace(".","[.]"),"No Data","No Data","No Data","No Data","No Data","No Data","No Data","No Data"))
+        else:
+            try:
+                if (samples_request_json['moreDataAvailable'] == True):
+                    offsets = [100,200,300,400,500]
+                    for x in offsets:
+                        URL_API='https://investigate.api.umbrella.com/samples/{}?offset={}&limit=500&sortby=score'.format(domain,x)
+                        samples_request_iter = session.get(URL_API, verify=False)
+                        checkAPITimeout(samples_request_iter.headers,samples_request_iter)
+                        time.sleep(1)
+                        samples_request_json_iter = samples_request_iter.json()
+                        if (samples_request_json_iter['moreDataAvailable'] == True):
+                            for event in samples_request_json_iter['samples']:
+                                print("{},{},{},{},{},{},{},{},{},{}".format(
+                                datetime.datetime.utcnow().isoformat(),
+                                str(domain).replace(".","[.]"),
+                                event['sha256'],
+                                event['md5'],
+                                event['sha1'],
+                                event['threatScore'],
+                                convertTime(event['firstSeen']),
+                                convertTime(event['lastSeen']),
+                                str(event['magicType']).replace(",","|"),
+                                event['size']))
+                        else:
+                            break
+            except KeyError:
+                pass
 finally:
     fp.close()
-
-
