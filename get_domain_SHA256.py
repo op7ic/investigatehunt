@@ -56,24 +56,24 @@ try:
         checkAPITimeout(samples_request.headers,samples_request)
         samples_request_json = samples_request.json()
         time.sleep(1)
-        for event in samples_request_json['samples']:
-            print("{},{},{},{},{},{},{},{},{},{}".format(datetime.datetime.utcnow().isoformat(),str(domain).replace(".","[.]"),event['sha256'],event['md5'],event['sha1'],event['threatScore'],convertTime(event['firstSeen']),convertTime(event['lastSeen']),str(event['magicType']).replace(",","|"),event['size']))
 
         if 'error' in samples_request_json:
             print("{},{},{},{},{},{},{},{},{},{}".format(datetime.datetime.utcnow().isoformat(),str(domain).replace(".","[.]"),"No Data","No Data","No Data","No Data","No Data","No Data","No Data","No Data"))
         else:
             try:
-                if (samples_request_json['moreDataAvailable'] == True):
-                    offsets = [100,200,300,400,500]
-                    for x in offsets:
-                        URL_API='https://investigate.api.umbrella.com/samples/{}?offset={}&limit=500&sortby=score'.format(domain,x)
-                        samples_request_iter = session.get(URL_API, verify=False)
-                        checkAPITimeout(samples_request_iter.headers,samples_request_iter)
-                        time.sleep(1)
-                        samples_request_json_iter = samples_request_iter.json()
-                        if (samples_request_json_iter['moreDataAvailable'] == True):
-                            for event in samples_request_json_iter['samples']:
-                                print("{},{},{},{},{},{},{},{},{},{}".format(
+            	for event in samples_request_json['samples']:
+            		print("{},{},{},{},{},{},{},{},{},{}".format(datetime.datetime.utcnow().isoformat(),str(domain).replace(".","[.]"),event['sha256'],event['md5'],event['sha1'],event['threatScore'],convertTime(event['firstSeen']),convertTime(event['lastSeen']),str(event['magicType']).replace(",","|"),event['size']))
+            	if (samples_request_json['moreDataAvailable'] == True):
+            		offsets = [100,200,300,400,500]
+            		for x in offsets:
+            			URL_API='https://investigate.api.umbrella.com/samples/{}?offset={}&limit=500&sortby=score'.format(domain,x)
+            			samples_request_iter = session.get(URL_API, verify=False)
+            			checkAPITimeout(samples_request_iter.headers,samples_request_iter)
+            			time.sleep(1)
+            			samples_request_json_iter = samples_request_iter.json()
+            			if (samples_request_json_iter['moreDataAvailable'] == True):
+            				for event in samples_request_json_iter['samples']:
+            					print("{},{},{},{},{},{},{},{},{},{}".format(
                                 datetime.datetime.utcnow().isoformat(),
                                 str(domain).replace(".","[.]"),
                                 event['sha256'],
@@ -84,9 +84,13 @@ try:
                                 convertTime(event['lastSeen']),
                                 str(event['magicType']).replace(",","|"),
                                 event['size']))
-                        else:
-                            break
+            			else:
+            				break
             except KeyError:
-                pass
+            	pass
+            except:
+            	pass
 finally:
     fp.close()
+
+
